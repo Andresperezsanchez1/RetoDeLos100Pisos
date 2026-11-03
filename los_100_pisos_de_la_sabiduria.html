@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Los 100 Pisos de la Sabiduría</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        mystic: {
+                            900: '#0a0d14',
+                            800: '#121824',
+                            700: '#1e2738',
+                            gold: '#dfb259',
+                            goldHover: '#f5cc76',
+                            crimson: '#9b1c1c',
+                            emerald: '#0e7490',
+                        }
+                    },
+                    boxShadow: {
+                        'gold-glow': '0 0 25px rgba(223, 178, 89, 0.35)',
+                        'red-glow': '0 0 25px rgba(239, 68, 68, 0.4)',
+                        'door-glow': '0 0 50px rgba(223, 178, 89, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0d14;
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(30, 39, 56, 0.6) 0%, transparent 70%),
+                radial-gradient(circle at 50% 80%, rgba(10, 13, 20, 0.9) 0%, #0a0d14 100%);
+            color: #e2e8f0;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* Ambient Stars/Dust */
+        .stars {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            background: radial-gradient(2px 2px at 20px 30px, #dfb259, rgba(0,0,0,0)),
+                        radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                        radial-gradient(1px 1px at 90px 40px, #dfb259, rgba(0,0,0,0)),
+                        radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.8), rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            opacity: 0.25;
+            z-index: 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0d14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e2738;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #dfb259;
+        }
+
+        /* Door 3D Scene */
+        .door-perspective {
+            perspective: 1200px;
+        }
+
+        .door-container {
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        .door-leaf {
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: left center;
+        }
+
+        .door-leaf-right {
+            transform-origin: right center;
+        }
+
+        .door-open-left {
+            transform: rotateY(-110deg);
+        }
+
+        .door-open-right {
+            transform: rotateY(110deg);
+        }
+
+        /* Elevator Fall & Rise Animations */
+        @keyframes elevatorFall {
+            0% { transform: translateY(0); filter: blur(0); }
+            20% { transform: translateY(-15px); }
+            50% { transform: translateY(120px); filter: blur(4px); }
+            80% { transform: translateY(-10px); }
+            100% { transform: translateY(0); filter: blur(0); }
+        }
+
+        @keyframes elevatorRise {
+            0% { transform: translateY(40px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .anim-fall {
+            animation: elevatorFall 0.8s ease-in-out;
+        }
+
+        .anim-rise {
+            animation: elevatorRise 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Torch effect */
+        .torch-glow {
+            animation: flicker 2s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.95); }
+            75% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Option hover transition */
+        .option-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-btn:hover {
+            transform: translateX(6px);
+        }
+
+        /* Glassmorphism panel */
+        .glass-panel {
+            background: rgba(18, 24, 36, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(223, 178, 89, 0.2);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans justify-between min-h-screen relative">
+    <div class="stars"></div>
+
+    <!-- HEADER / BARRA DE PROGRESO DE LA TORRE -->
+    <header class="relative z-10 w-full max-w-5xl mx-auto p-4 sm:p-6">
+        <div class="glass-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-2xl">
+            <!-- Título y Logotipo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-mystic-gold to-yellow-700 flex items-center justify-center text-mystic-900 shadow-gold-glow">
+                    <i class="fa-solid fa-tower-observation text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-cinzel text-lg sm:text-xl font-bold tracking-wider text-mystic-gold">100 PISOS DE LA SABIDURÍA</h1>
+                    <p class="text-xs text-gray-400">Demuestra tu conocimiento para coronar la cima</p>
+                </div>
+            </div>
+
+            <!-- Stats & Indicador de Piso -->
+            <div class="flex items-center gap-6">
+                <!-- Errores cometidos -->
+                <div class="text-center px-3 border-r border-gray-700/60">
+                    <span class="block text-xs text-gray-400 uppercase tracking-widest">Fallos</span>
+                    <span id="stat-failures" class="font-cinzel text-lg font-bold text-red-400">0</span>
+                </div>
+
+                <!-- Tiempo -->
+                <div class="text-center px-3 border-r border-gray-700/60">
+                    <span class="block text-xs text-gray-400 uppercase tracking-widest">Tiempo</span>
+                    <span id="stat-time" class="font-cinzel text-lg font-bold text-mystic-gold">00:00</span>
+                </div>
+
+                <!-- Insignia del Piso -->
+                <div class="flex items-center gap-2 bg-mystic-700/60 px-4 py-2 rounded-xl border border-mystic-gold/30">
+                    <i class="fa-solid fa-layer-group text-mystic-gold"></i>
+                    <div>
+                        <span class="text-xs text-gray-400 block leading-none">PISO</span>
+                        <span id="current-floor-display" class="font-cinzel text-xl font-extrabold text-white leading-none">1 / 100</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de Progreso Visual de la Torre (Barra Continua) -->
+        <div class="mt-3 w-full bg-mystic-900 rounded-full h-3 p-0.5 border border-mystic-gold/20 shadow-inner overflow-hidden">
+            <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-amber-600 via-mystic-gold to-yellow-300 rounded-full transition-all duration-500 shadow-gold-glow" style="width: 1%;"></div>
+        </div>
+    </header>
+
+    <!-- ÁREA PRINCIPAL DEL JUEGO -->
+    <main id="game-container" class="relative z-10 my-auto w-full max-w-4xl mx-auto p-4 flex flex-col items-center justify-center">
+
+        <!-- ================= NIVEL 1: LA PUERTA DE ENTRADA ================= -->
+        <div id="floor-1-view" class="w-full flex flex-col items-center justify-center transition-all duration-500">
+            <div class="text-center mb-6">
+                <h2 class="font-cinzel text-2xl sm:text-3xl font-extrabold text-mystic-gold tracking-wide">EL UMBRAL DE LA SABIDURÍA</h2>
+                <p class="text-gray-300 text-sm sm:text-base mt-1 max-w-md mx-auto">Para iniciar tu ascenso por la Gran Torre, toca el grabado arcan de la puerta.</p>
+            </div>
+
+            <!-- Marco de la Puerta Mística -->
+            <div class="door-perspective relative w-72 h-96 sm:w-80 sm:h-[420px] rounded-t-full bg-mystic-800 border-4 border-mystic-gold/40 shadow-gold-glow flex items-center justify-center overflow-hidden">
+                <!-- Fondo interior que se ve al abrir la puerta -->
+                <div class="absolute inset-0 bg-gradient-to-b from-amber-600/30 via-mystic-900 to-black flex flex-col items-center justify-center text-center p-6">
+                    <i class="fa-solid fa-sparkles text-mystic-gold text-4xl mb-4 animate-bounce"></i>
+                    <p class="font-cinzel text-mystic-gold font-bold text-lg">¡EL CAMINO SE HA REVELADO!</p>
+                    <p class="text-xs text-gray-300 mt-2">Adéntrate en los misterios de la mente.</p>
+                </div>
+
+                <!-- Hoja Izquierda de la Puerta -->
+                <div id="door-left" class="door-leaf absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-mystic-800 to-mystic-700 border-r-2 border-mystic-gold/50 flex flex-col items-center justify-center cursor-pointer shadow-2xl group">
+                    <div class="absolute inset-2 border border-mystic-gold/20 rounded-tl-full pointer-events-none"></div>
+                    <!-- Antorcha izquierda -->
+                    <div class="absolute top-1/4 left-3 w-3 h-8 bg-amber-900 rounded-sm">
+                        <div class="w-4 h-4 bg-amber-500 rounded-full torch-glow -mt-2 -ml-0.5 blur-xs shadow-[0_0_12px_#f59e0b]"></div>
+                    </div>
+                </div>
+
+                <!-- Hoja Derecha de la Puerta -->
+                <div id="door-right" class="door-leaf door-leaf-right absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-mystic-800 to-mystic-700 border-l-2 border-mystic-gold/50 flex flex-col items-center justify-center cursor-pointer shadow-2xl group">
+                    <div class="absolute inset-2 border border-mystic-gold/20 rounded-tr-full pointer-events-none"></div>
+                    <!-- Antorcha derecha -->
+                    <div class="absolute top-1/4 right-3 w-3 h-8 bg-amber-900 rounded-sm">
+                        <div class="w-4 h-4 bg-amber-500 rounded-full torch-glow -mt-2 -ml-0.5 blur-xs shadow-[0_0_12px_#f59e0b]"></div>
+                    </div>
+                </div>
+
+                <!-- Sello Grabado Central ("1") que interactúa -->
+                <button id="door-btn" onclick="openFirstDoor()" class="absolute z-20 w-24 h-24 rounded-full bg-gradient-to-br from-mystic-gold via-amber-600 to-yellow-700 text-mystic-900 font-cinzel text-5xl font-extrabold flex items-center justify-center shadow-gold-glow border-4 border-amber-200 transition-transform duration-300 hover:scale-110 active:scale-95 group cursor-pointer">
+                    <span class="drop-shadow-md group-hover:animate-pulse">1</span>
+                </button>
+            </div>
+
+            <p class="text-xs text-mystic-gold/70 mt-4 animate-pulse"><i class="fa-solid fa-hand-pointer mr-1"></i> Pulsa el '1' grabado en el sello para abrir la torre</p>
+        </div>
+
+
+        <!-- ================= PISOS 2 AL 10: PUZLES Y TEST ================= -->
+        <div id="quiz-view" class="w-full hidden max-w-2xl">
+            <div id="quiz-card" class="glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-mystic-gold/30 relative overflow-hidden">
+                
+                <!-- Decoración superior -->
+                <div class="flex items-center justify-between border-b border-gray-700/60 pb-4 mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-mystic-gold animate-ping"></span>
+                        <span id="puzzle-category" class="text-xs font-semibold uppercase tracking-widest text-mystic-gold">ACERTIJO DE LÓGICA</span>
+                    </div>
+                    <span id="puzzle-difficulty" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-mystic-700 text-gray-300">Dificultad: Normal</span>
+                </div>
+
+                <!-- Enunciado de la Pregunta / Puzle -->
+                <div class="min-h-[100px] flex items-center justify-center text-center my-2">
+                    <h3 id="puzzle-question" class="font-cinzel text-lg sm:text-xl md:text-2xl font-bold text-gray-100 leading-relaxed">
+                        Cargando desafío...
+                    </h3>
+                </div>
+
+                <!-- Indicador de Advertencia de la Penalización de -5 Pisos -->
+                <div class="bg-red-950/40 border border-red-800/40 rounded-xl p-2.5 mb-6 flex items-center justify-center gap-2 text-xs text-red-300">
+                    <i class="fa-solid fa-triangle-exclamation text-red-400"></i>
+                    <span>Precaución: Un error te hará caer <strong>5 niveles hacia abajo</strong>.</span>
+                </div>
+
+                <!-- Opciones de Respuesta (4 Botones) -->
+                <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <!-- Generado dinámicamente -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA DE VICTORIA ================= -->
+        <div id="victory-view" class="w-full hidden max-w-2xl text-center">
+            <div class="glass-panel rounded-3xl p-8 sm:p-10 shadow-gold-glow border-2 border-mystic-gold relative">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-mystic-gold/20 flex items-center justify-center border-2 border-mystic-gold text-mystic-gold text-4xl animate-bounce">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <h2 class="font-cinzel text-3xl sm:text-4xl font-extrabold text-mystic-gold mb-2">¡HAS CORONADO LOS 100 PISOS!</h2>
+                <p class="text-gray-300 text-sm sm:text-base mb-6">Has demostrado una inteligencia sobrehumana completando los 100 pisos de la Torre de la Sabiduría.</p>
+
+                <!-- Resumen de estadísticas -->
+                <div class="grid grid-cols-2 gap-4 bg-mystic-900/80 p-4 rounded-2xl mb-8 border border-mystic-gold/20">
+                    <div class="p-3">
+                        <span class="block text-xs text-gray-400">TIEMPO TOTAL</span>
+                        <span id="final-time" class="font-cinzel text-2xl font-bold text-mystic-gold">00:00</span>
+                    </div>
+                    <div class="p-3">
+                        <span class="block text-xs text-gray-400">FALLOS TOTALES</span>
+                        <span id="final-failures" class="font-cinzel text-2xl font-bold text-red-400">0</span>
+                    </div>
+                </div>
+
+                <button onclick="restartGame()" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-mystic-gold to-yellow-600 text-mystic-900 font-cinzel font-bold text-lg shadow-gold-glow transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> REINICIAR LA ASCENSIÓN
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- NOTIFICACIÓN OVERLAY PARA CAMBIO DE PISO / PENALIZACIÓN -->
+    <div id="floor-toast" class="fixed inset-0 z-50 pointer-events-none flex items-center justify-center transition-opacity duration-300 opacity-0">
+        <div id="toast-card" class="glass-panel px-8 py-6 rounded-2xl shadow-2xl text-center transform transition-all duration-300 scale-90 border-2">
+            <div id="toast-icon" class="text-4xl mb-2"></div>
+            <h4 id="toast-title" class="font-cinzel text-2xl font-extrabold mb-1"></h4>
+            <p id="toast-desc" class="text-sm text-gray-300"></p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 w-full text-center py-4 text-xs text-gray-500 border-t border-gray-800/60 mt-auto">
+        <p>Los 100 Pisos de la Sabiduría &copy; Juego de Lógica e Investigación</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ================= BANCO DE PREGUNTAS Y PUZLES (NIVELES 2 AL 100) =================
+        const PUZZLES = {
+            // ----- PISOS 2 AL 15: INICIACIÓN Y LÓGICA BÁSICA -----
+            2: { category: "LÓGICA ELEMENTAL", difficulty: "Principiante", question: "Si 5 gatos cazan 5 ratones en 5 minutos, ¿cuántos gatos cazan 100 ratones en 100 minutos?", options: ["100 gatos", "20 gatos", "5 gatos", "50 gatos"], correct: 2 },
+            3: { category: "SECUENCIAS", difficulty: "Principiante", question: "Sucesión numérica: <span class='text-mystic-gold font-mono'>2, 6, 12, 20, 30, ___</span>", options: ["36", "42", "40", "48"], correct: 1 },
+            4: { category: "ACERTIJO CLÁSICO", difficulty: "Principiante", question: "Tengo ciudades pero no casas, montañas pero no árboles, y agua pero no peces. ¿Qué soy?", options: ["Un espejo", "Un mapa", "Un sueño", "Un desierto"], correct: 1 },
+            5: { category: "LÓGICA TEMPORAL", difficulty: "Principiante", question: "Anteayer María tenía 17 años. El año que viene cumplirá 20. ¿En qué día nació?", options: ["1 de Enero", "31 de Diciembre", "29 de Febrero", "30 de Diciembre"], correct: 1 },
+            6: { category: "GEOMETRÍA LÓGICA", difficulty: "Principiante", question: "¿Cuántas aristas tiene un cubo?", options: ["8", "12", "6", "10"], correct: 1 },
+            7: { category: "DEDUCCIÓN", difficulty: "Principiante", question: "La madre de Rosa tiene 4 hijas: Abril, Mayo, Junio y... ¿quién es la cuarta?", options: ["Julio", "Rosa", "Agosto", "Marta"], correct: 1 },
+            8: { category: "JUEGO DE PALABRAS", difficulty: "Principiante", question: "Empieza por C, contiene una letra y termina en A. ¿Qué es?", options: ["Casa", "Carta", "Copa", "Caja"], correct: 1 },
+            9: { category: "ARITMÉTICA RÁPIDA", difficulty: "Principiante", question: "Divide 30 por 0.5 y súmale 10. ¿Cuál es el resultado?", options: ["25", "70", "45", "65"], correct: 1 },
+            10: { category: "DEDUCCIÓN", difficulty: "Principiante", question: "Si me nombras, desaparezco. ¿Qué soy?", options: ["El viento", "El silencio", "La sombra", "El eco"], correct: 1 },
+            11: { category: "MATEMÁTICAS", difficulty: "Fácil", question: "¿Cuántos meses tienen 28 días en un año bisiesto?", options: ["1 mes", "12 meses", "2 meses", "Ninguno"], correct: 1 },
+            12: { category: "PATRÓN VISUAL", difficulty: "Fácil", question: "Si triángulo es 3 y cuadrado es 4, ¿cuánto suma un hexágono más un pentágono?", options: ["11", "10", "12", "9"], correct: 0 },
+            13: { category: "LÓGICA", difficulty: "Fácil", question: "¿Qué sube pero nunca baja?", options: ["El humo", "La edad", "La temperatura", "El agua"], correct: 1 },
+            14: { category: "SERIES NUMÉRICAS", difficulty: "Fácil", question: "Completa la serie: <span class='text-mystic-gold font-mono'>1, 1, 2, 3, 5, 8, 13, ___</span>", options: ["18", "21", "20", "24"], correct: 1 },
+            15: { category: "ACERTIJO", difficulty: "Fácil", question: "Cuanto más quitas, más grande se vuelve. ¿Qué es?", options: ["Un hoyo", "La sombra", "Una deuda", "El tiempo"], correct: 0 },
+
+            // ----- PISOS 16 AL 30: CRIPTOGRAFÍA Y ACERTIJOS DIVERSOS -----
+            16: { category: "CRIPTOGRAFÍA", difficulty: "Fácil - Medio", question: "Cifrado César (+1): ¿Qué palabra oculta representa <span class='text-mystic-gold font-mono'>'UPSSO'</span>?", options: ["TORNO", "TORRE", "TIGRE", "TRONO"], correct: 1 },
+            17: { category: "LOGICA FÍSICA", difficulty: "Medio", question: "Un kilo de plumas y un kilo de plomo se caen al vacío al mismo tiempo. ¿Cuál cae antes?", options: ["El plomo", "Las plumas", "Llegan al mismo tiempo", "Depende del volumen"], correct: 2 },
+            18: { category: "BALANZAS", difficulty: "Medio", question: "Si 2 manzanas equivalen a 1 pera, y 3 peras a 1 piña. ¿Cuántas manzanas equivalen a 2 piñas?", options: ["6 manzanas", "12 manzanas", "8 manzanas", "10 manzanas"], correct: 1 },
+            19: { category: "ENIGMA DE TIEMPO", difficulty: "Medio", question: "¿Qué ocurre una vez en un minuto, dos veces en un momento y nunca en cien años?", options: ["La muerte", "La letra M", "Un parpadeo", "El destino"], correct: 1 },
+            20: { category: "GEOMETRÍA", difficulty: "Medio", question: "¿Cuántos lados tiene un heptágono?", options: ["6", "7", "8", "9"], correct: 1 },
+            21: { category: "ACERTIJO", difficulty: "Medio", question: "Tengo cuello pero no cabeza, y llevo sombrero pero no cara. ¿Qué soy?", options: ["Una botella", "Un hongo", "Una camisa", "Una chimenea"], correct: 0 },
+            22: { category: "SERIES LEITMOTIF", difficulty: "Medio", question: "¿Qué letra sigue en esta serie? <span class='text-mystic-gold font-mono'>E, S, T, Q, C, S, ___</span>", options: ["S", "O", "N", "D"], correct: 0 },
+            23: { category: "LÓGICA", difficulty: "Medio", question: "Un conductor ve un semáforo en rojo. ¿Qué es lo primero que presiona?", options: ["El freno", "El embrague", "El pedal de acelerar", "El pedal del freno"], correct: 0 },
+            24: { category: "PROBABILIDAD BÁSICA", difficulty: "Medio", question: "Lanzas una moneda limpia 3 veces y sale cara. ¿Probabilidad de que la 4ª sea cara?", options: ["12.5%", "50%", "25%", "75%"], correct: 1 },
+            25: { category: "ACERTIJO PÁRROCO", difficulty: "Medio", question: "Si 3 niños tardan 3 horas en hacer 3 dibujos, ¿cuántos niños hacen 6 dibujos en 6 horas?", options: ["6 niños", "3 niños", "9 niños", "12 niños"], correct: 1 },
+            26: { category: "MATEMÁTICAS", difficulty: "Medio", question: "¿Cuál es el valor numérico de Romano <span class='text-mystic-gold font-mono'>'MCDXCIV'</span>?", options: ["1494", "1694", "1496", "1594"], correct: 0 },
+            27: { category: "LÓGICA ESPACIAL", difficulty: "Medio", question: "Un tren eléctrico va hacia el Norte a 80 km/h. El viento sopla hacia el Oeste. ¿Hacia dónde va el humo?", options: ["Oeste", "Este", "Norte", "No echa humo"], correct: 3 },
+            28: { category: "ENIGMA", difficulty: "Medio", question: "Puedo volar sin alas y llorar sin ojos. ¿Qué soy?", options: ["El viento", "Una nube", "El alma", "El pensamiento"], correct: 1 },
+            29: { category: "ARITMÉTICA", difficulty: "Medio", question: "Si <span class='text-mystic-gold font-mono'>x + y = 10</span> y <span class='text-mystic-gold font-mono'>x - y = 4</span>, ¿cuánto vale <span class='text-mystic-gold font-mono'>x * y</span>?", options: ["21", "24", "16", "20"], correct: 0 },
+            30: { category: "CRIPTOGRAFÍA", difficulty: "Medio - Alto", question: "Descodifica la palabra invertida y desplazada: <span class='text-mystic-gold font-mono'>'A-I-R-O-D-A-N-E-G'</span>", options: ["GENERADOR", "GANADORA", "DEGENERADO", "GENERACIÓN"], correct: 0 },
+
+            // ----- PISOS 31 AL 50: MATEMÁTICAS Y DEDUCCIÓN AVANZADA -----
+            31: { category: "LÓGICA VERBAL", difficulty: "Medio - Alto", question: "¿Qué palabra de 5 letras se vuelve más corta cuando le añades 2 letras?", options: ["Larga", "Corta", "Breve", "Grande"], correct: 1 },
+            32: { category: "PROBABILIDAD", difficulty: "Medio - Alto", question: "En una caja hay 4 bolas rojas y 4 azules. Extraes 2 al azar. ¿Probabilidad de que sean del mismo color?", options: ["3/7", "1/2", "4/7", "2/5"], correct: 0 },
+            33: { category: "RAZONAMIENTO", difficulty: "Medio - Alto", question: "Un abuelo, dos padres y dos hijos fueron a pescar y cazaron 3 peces. Cada uno se comió uno. ¿Cómo?", options: ["Comieron la mitad", "Eran 3 personas", "Uno tiró su pez", "Eran 4 personas"], correct: 1 },
+            34: { category: "SERIES MATEMÁTICAS", difficulty: "Medio - Alto", question: "<span class='text-mystic-gold font-mono'>3, 5, 9, 17, 33, ___</span> ¿Cuál sigue?", options: ["65", "64", "66", "58"], correct: 0 },
+            35: { category: "ENIGMA GEOMÉTRICO", difficulty: "Medio - Alto", question: "¿Cuántos grados suman los ángulos internos de un pentágono regular?", options: ["360°", "540°", "720°", "450°"], correct: 1 },
+            36: { category: "LÓGICA PUZLE", difficulty: "Medio - Alto", question: "Tengo un reloj que se atrasa 2 minutos cada hora. Tras 24h, ¿cuántos minutos se habrá retrasado?", options: ["24", "48", "12", "36"], correct: 1 },
+            37: { category: "ACERTIJO CLÁSICO", difficulty: "Medio - Alto", question: "Siempre estoy en el pasado, nunca en el futuro, y contengo el presente. ¿Qué soy?", options: ["La memoria", "La historia", "El diccionario", "El pensamiento"], correct: 2 },
+            38: { category: "CRIPTOGRAFÍA", difficulty: "Alto", question: "Si A=1, B=2... ¿Qué número resulta de la suma de las letras de <span class='text-mystic-gold font-mono'>'SOL'</span>?", options: ["48", "45", "46", "44"], correct: 0 },
+            39: { category: "LÓGICA COMBINATORIA", difficulty: "Alto", question: "Si hay 4 personas en una reunión y todas se saludan entre sí una vez. ¿Cuántos apretones de manos hay?", options: ["8", "6", "12", "16"], correct: 1 },
+            40: { category: "ALGEBRA", difficulty: "Alto", question: "Resuelve: <span class='text-mystic-gold font-mono'>2^5 + 2^5 = ?</span>", options: ["2^6", "2^10", "4^5", "4^10"], correct: 0 },
+            41: { category: "DEDUCCIÓN", difficulty: "Alto", question: "Si un médico te da 3 pastillas y te dice que tomes una cada media hora, ¿cuánto duran?", options: ["1 hora y media", "1 hora", "2 horas", "30 minutos"], correct: 1 },
+            42: { category: "ENIGMA DE AGUA", difficulty: "Alto", question: "Tienes una jarra de 5L y una de 3L. ¿Cómo mides exactamente 4 litros?", options: ["Llenar 5L, pasar a 3L, vaciar 3L, pasar 2L restantes a 3L, llenar 5L y completar 3L", "Mezclar 5L y 3L y quitar 1L", "Llenar dos veces la de 3L", "No es posible"], correct: 0 },
+            43: { category: "CONJUNTOS", difficulty: "Alto", question: "En un grupo de 30 personas, 20 hablan inglés y 15 francés. 5 hablan ambos. ¿Cuántos no hablan ninguno?", options: ["0", "5", "10", "2"], correct: 0 },
+            44: { category: "PATRÓN NUMÉRICO", difficulty: "Alto", question: "Encuentra la X: <span class='text-mystic-gold font-mono'>8 (28) 6 | 7 (X) 5</span>", options: ["24", "22", "26", "20"], correct: 0 },
+            45: { category: "LÓGICA ESTRUCTURAL", difficulty: "Alto", question: "Un cubo de madera de 3x3x3 se pinta de rojo exteriormente y se corta en 27 cubitos de 1x1x1. ¿Cuántos no tienen pintura?", options: ["1", "0", "8", "6"], correct: 0 },
+            46: { category: "ACERTIJO MÍSTICO", difficulty: "Alto", question: "Parezco piedra, rompo el agua, pero en el fuego me derrito inmediatamente. ¿Qué soy?", options: ["La cera", "El hielo", "El cristal", "La sal"], correct: 1 },
+            47: { category: "SERIE DE POTENCIAS", difficulty: "Alto", question: "¿Qué número sigue? <span class='text-mystic-gold font-mono'>1, 8, 27, 64, 125, ___</span>", options: ["196", "216", "225", "256"], correct: 1 },
+            48: { category: "FÍSICA LÓGICA", difficulty: "Alto", question: "Un barco está anclado y tiene una escala colgada. Las peldaños distan 20 cm. Si la marea sube 60 cm, ¿cuántos peldaños cubre?", options: ["3 peldaños", "Ninguno", "2 peldaños", "6 peldaños"], correct: 1 },
+            49: { category: "SISTEMA NUMÉRICO", difficulty: "Alto", question: "¿A qué número decimal equivale el binario <span class='text-mystic-gold font-mono'>'11010'</span>?", options: ["26", "28", "24", "22"], correct: 0 },
+            50: { category: "PUNTO MEDIO DE LA TORRE", difficulty: "Desafío Especial", question: "Si <span class='text-mystic-gold font-mono'>A+B=12</span>, <span class='text-mystic-gold font-mono'>B+C=20</span>, y <span class='text-mystic-gold font-mono'>A+C=16</span>. ¿Cuál es la suma de <span class='text-mystic-gold font-mono'>A+B+C</span>?", options: ["24", "48", "32", "28"], correct: 0 },
+
+            // ----- PISOS 51 AL 75: ENIGMAS AVANZADOS Y MATEMÁTICA PURA -----
+            51: { category: "ARITMÉTICA MODULAR", difficulty: "Avanzado", question: "¿Cuál es el resto de dividir <span class='text-mystic-gold font-mono'>7^3</span> entre 5?", options: ["3", "2", "1", "4"], correct: 0 },
+            52: { category: "DESAFÍO RAZONADO", difficulty: "Avanzado", question: "Un padre tiene el triple de edad que su hijo. En 12 años tendrá el doble. ¿Qué edad tiene el hijo hoy?", options: ["12 años", "15 años", "18 años", "10 años"], correct: 0 },
+            53: { category: "CRIPTOGRAFÍA", difficulty: "Avanzado", question: "Anagrama místico: Reordena <span class='text-mystic-gold font-mono'>'A-L-Q-U-I-M-I-A'</span> eliminando 1 'I' para formar la búsqueda de la sabiduría.", options: ["ALQUIMIA", "MAQUILA", "ALQUIMA", "MISTICA"], correct: 2 },
+            54: { category: "LÓGICA COMBINATORIA", difficulty: "Avanzado", question: "¿De cuántas formas distintas se pueden ordenar 4 libros en un estante?", options: ["24", "12", "16", "20"], correct: 0 },
+            55: { category: "PARADOJA", difficulty: "Avanzado", question: "En un pueblo, el barbero afeita a todos los hombres que no se afeitan a sí mismos. ¿Quién afeita al barbero?", options: ["El mismo", "Nadie", "Es una paradoja", "Su ayudante"], correct: 2 },
+            56: { category: "DEDUCCIÓN SANGUÍNEA", difficulty: "Avanzado", question: "Carlos mira un retrato y dice: 'No tengo hermanos, pero el padre de este hombre es el hijo de mi padre'. ¿Quién es?", options: ["Su hijo", "Él mismo", "Su padre", "Su nieto"], correct: 0 },
+            57: { category: "GEOMETRÍA AVANZADA", difficulty: "Avanzado", question: "¿Cuál es el área de un triángulo equilátero de lado 4 unidades?", options: ["4√3", "8√3", "16", "8"], correct: 0 },
+            58: { category: "SERIE COMPLEJA", difficulty: "Avanzado", question: "¿Qué número falta? <span class='text-mystic-gold font-mono'>2, 3, 5, 7, 11, 13, 17, ___</span>", options: ["19", "21", "23", "18"], correct: 0 },
+            59: { category: "ACERTIJO CLÁSICO", difficulty: "Avanzado", question: "Tengo un solo ojo, pero no puedo ver nada. ¿Qué soy?", options: ["Una aguja", "Un huracán", "Una cueva", "Un espejo"], correct: 0 },
+            60: { category: "LÓGICA DE PUERTAS", difficulty: "Avanzado", question: "Frente a dos guardias (uno miente, otro dice la verdad), ¿qué pregunta hacer con 1 sola oportunidad para hallar la salida?", options: ["¿Cuál puerta diría el otro guardia que es la correcta?", "¿Eres el mentiroso?", "¿Cuál es tu puerta favorita?", "¿Es esta la salida?"], correct: 0 },
+            61: { category: "ALGEBRA RÁPIDA", difficulty: "Avanzado", question: "Si <span class='text-mystic-gold font-mono'>x^2 - y^2 = 36</span> y <span class='text-mystic-gold font-mono'>x - y = 4</span>, ¿cuánto vale <span class='text-mystic-gold font-mono'>x + y</span>?", options: ["9", "8", "12", "6"], correct: 0 },
+            62: { category: "PROBABILIDAD", difficulty: "Avanzado", question: "Lanzas dos dados comunes de 6 caras. ¿Probabilidad de sumar un total de 7?", options: ["1/6", "1/12", "1/36", "5/36"], correct: 0 },
+            63: { category: "LOGICA", difficulty: "Avanzado", question: "Un caracol sube una pared de 10 metros. De día sube 3 metros y de noche resbala 2 metros. ¿En cuántos días llega arriba?", options: ["8 días", "10 días", "7 días", "9 días"], correct: 0 },
+            64: { category: "SECUPATRON", difficulty: "Avanzado", question: "Si 11x11=4, 22x22=16, ¿cuánto es <span class='text-mystic-gold font-mono'>33x33</span>?", options: ["36", "18", "81", "64"], correct: 0 },
+            65: { category: "ENIGMA BISMUTO", difficulty: "Avanzado", question: "Nace en la tierra, vive en el agua y muere en el aire. ¿Qué es?", options: ["La niebla", "Una burbuja", "El hielo", "El vapor"], correct: 1 },
+            66: { category: "SISTEMA DECIMAL", difficulty: "Avanzado", question: "¿Cuántas veces aparece la cifra 9 entre el 1 y el 100?", options: ["20", "10", "19", "11"], correct: 0 },
+            67: { category: "DESAFÍO FÍSICO", difficulty: "Avanzado", question: "Si aumentas al doble el radio de un círculo, ¿por qué factor se multiplica su área?", options: ["4", "2", "8", "16"], correct: 0 },
+            68: { category: "GEOMETRÍA 3D", difficulty: "Avanzado", question: "¿Cuántos vértices tiene un octaedro regular?", options: ["6", "8", "12", "10"], correct: 0 },
+            69: { category: "TEORÍA DE NÚMEROS", difficulty: "Avanzado", question: "¿Cuál es el único número primo que también es par?", options: ["2", "0", "4", "Ninguno"], correct: 0 },
+            70: { category: "CÁLCULO RÁPIDO", difficulty: "Avanzado", question: "Suma los números del 1 al 100 consecutivamente. ¿Cuál es la suma?", options: ["5050", "5000", "5100", "4950"], correct: 0 },
+            71: { category: "PATRÓN MÍSTICO", difficulty: "Avanzado", question: "<span class='text-mystic-gold font-mono'>2, 3, 5, 8, 12, 17, ___</span> ¿Qué número continúa?", options: ["23", "22", "24", "25"], correct: 0 },
+            72: { category: "LÓGICA LOGARÍTMICA", difficulty: "Avanzado", question: "¿A qué es igual <span class='text-mystic-gold font-mono'>log_2(64)</span>?", options: ["6", "8", "32", "4"], correct: 0 },
+            73: { category: "CONJUNTOS Y LOGICA", difficulty: "Avanzado", question: "Si A es subconjunto de B, y B es disjunto con C, ¿qué relación hay entre A y C?", options: ["Son disjuntos", "Son iguales", "A contiene a C", "A es mayor que C"], correct: 0 },
+            74: { category: "CRIPTOGRAMA", difficulty: "Avanzado", question: "Si la palabra 'LUZ' equivale a 47 (12+21+26 en abecedario inverso), ¿a qué equivale 'SOL'?", options: ["33", "36", "40", "38"], correct: 0 },
+            75: { category: "ACERTIJO MAESTRO", difficulty: "Avanzado", question: "Puedo ser devorado pero no tengo cuerpo, puedo ser cortado pero no tengo sangre. ¿Qué soy?", options: [" El mazo de cartas", "El tiempo", "El silencio", "La sombra"], correct: 0 },
+
+            // ----- PISOS 76 AL 99: EL DOMINIO MAESTRO (NIVEL LEYENDA) -----
+            76: { category: "TEORÍA DE JUEGOS", difficulty: "Leyenda", question: "En el dilema del prisionero, si ambos confiesan reciben pena media, si uno confiesa y otro no, el delator sale libre. ¿Cuál es el equilibrio de Nash?", options: ["Ambos confiesan", "Ninguno confiesa", "Uno confiesa al azar", "No existe equilibrio"], correct: 0 },
+            77: { category: "MÓDULO Y POTENCIAS", difficulty: "Leyenda", question: "¿Cuál es el último dígito de <span class='text-mystic-gold font-mono'>3^100</span>?", options: ["1", "3", "7", "9"], correct: 0 },
+            78: { category: "PROBABILIDAD MONTY HALL", difficulty: "Leyenda", question: "En el problema de Monty Hall con 3 puertas, tras revelar una cabra, ¿cambiar de puerta mejora tus opciones?", options: ["Sí, aumenta a 2/3", "No, sigue en 1/2", "Disminuye a 1/3", "Depende del concursante"], correct: 0 },
+            79: { category: "LÓGICA DEDUCTIVA", difficulty: "Leyenda", question: "Tres sabios tienen sombreros negros o blancos. Todos ven los sombreros ajenos. Si al menos uno es negro y nadie habla al inicio, ¿cuántos sombreros negros hay si el primero deduce el suyo?", options: ["1 sombrero negro", "2 sombreros negros", "3 sombreros negros", "Indeterminado"], correct: 0 },
+            80: { category: "FIBONACCI Y RATICIO", difficulty: "Leyenda", question: "¿Hacia qué constante matemática converge la razón entre dos números consecutivos de Fibonacci?", options: ["Número Áureo (Phi ≈ 1.618)", "Número e (≈ 2.718)", "Pi (≈ 3.1415)", "Constante de Euler"], correct: 0 },
+            81: { category: "ENIGMA FÍSICO-MATEMÁTICO", difficulty: "Leyenda", question: "¿En cuántas partes máximas puedes cortar una tarta redonda realizando 4 cortes rectos?", options: ["11", "16", "10", "14"], correct: 0 },
+            82: { category: "SECUENCIA DE CONWAY", difficulty: "Leyenda", question: "Serie 'mira y di': <span class='text-mystic-gold font-mono'>1, 11, 21, 1211, 111221, ___</span> ¿Cuál sigue?", options: ["312211", "132211", "11122211", "311221"], correct: 0 },
+            83: { category: "LOGICA FILOSÓFICA", difficulty: "Leyenda", question: "¿Cómo se llama la paradoja que plantea si una nave cuyas piezas se reemplazan gradualmente sigue siendo la misma?", options: ["Barco de Teseo", "Paradoja de Aquiles", "Paradoja de Russell", "Gato de Schrödinger"], correct: 0 },
+            84: { category: "MATEMÁTICA COMBINATORIA", difficulty: "Leyenda", question: "¿De cuántas formas se pueden sentar 5 personas alrededor de una mesa circular?", options: ["24", "120", "60", "48"], correct: 0 },
+            85: { category: "ENIGMA DE EDADES", difficulty: "Leyenda", question: "Un hombre dice: 'Tengo el doble de la edad que tú tenías cuando yo tenía la edad que tú tienes'. Si la suma de sus edades es 56, ¿qué edad tiene?", options: ["32 años", "24 años", "28 años", "36 años"], correct: 0 },
+            86: { category: "TOPOLOGÍA", difficulty: "Leyenda", question: "¿Cuántas caras tiene una Cinta de Moebius?", options: ["1 cara", "2 caras", "Infinitas", "Ninguna"], correct: 0 },
+            87: { category: "ÁLGEBRA MATRICIAL", difficulty: "Leyenda", question: "¿Cuál es el determinante de una matriz identidad de tamaño 4x4?", options: ["1", "4", "0", "16"], correct: 0 },
+            88: { category: "TEORÍA DE GRAFOS", difficulty: "Leyenda", question: "El famoso problema de los puentes de Königsberg demostró que no se podían cruzar todos una sola vez. ¿Cuántos puentes eran?", options: ["7 puentes", "6 puentes", "8 puentes", "5 puentes"], correct: 0 },
+            89: { category: "ALGORITMOS", difficulty: "Leyenda", question: "¿Cuál es la complejidad temporal en el peor caso del algoritmo de ordenación QuickSort?", options: ["O(n^2)", "O(n log n)", "O(n)", "O(2^n)"], correct: 0 },
+            90: { category: "SISTEMA HEXADECIMAL", difficulty: "Leyenda", question: "Convertir el número hexadecimal <span class='text-mystic-gold font-mono'>'FF'</span> a decimal:", options: ["255", "256", "240", "100"], correct: 0 },
+            91: { category: "DESAFÍO BINARIO", difficulty: "Leyenda", question: "Aplica la operación lógica <span class='text-mystic-gold font-mono'>1010 XOR 1100</span>. ¿Resultado en binario?", options: ["0110", "1110", "1000", "0010"], correct: 0 },
+            92: { category: "GEOMETRÍA FRACTAL", difficulty: "Leyenda", question: "¿Qué dimensión fractal aproximada tiene la curva de Koch?", options: ["1.2619", "1.5", "2.0", "1.732"], correct: 0 },
+            93: { category: "TEORÍA DE NÚMEROS", difficulty: "Leyenda", question: "Un número es 'perfecto' si la suma de sus divisores propios es igual a él. ¿Cuál es el primer número perfecto?", options: ["6", "12", "28", "4"], correct: 0 },
+            94: { category: "ACERTIJO DE LÓGICA PURA", difficulty: "Leyenda", question: "Si un hombre tarda 8 minutos en caminar a 6 km/h, ¿a qué velocidad debe correr para hacer el trayecto en 4 minutos?", options: ["12 km/h", "10 km/h", "16 km/h", "14 km/h"], correct: 0 },
+            95: { category: "PARADOJA MÍSTICA", difficulty: "Leyenda", question: "Un cocodrilo roba un bebé y promete devolverlo si el padre adivina lo que hará. El padre dice: 'No me lo devolverás'. ¿Qué ocurre?", options: ["Paradoja insoluble", "Devuelve el bebé", "Se lo come", "El padre falla"], correct: 0 },
+            96: { category: "ENIGMA DE MONEDAS", difficulty: "Leyenda", question: "Tienes 9 monedas idénticas, pero 1 es más pesada. Con una balanza de platos, ¿cuál es el mínimo de pesadas garantizado para hallarla?", options: ["2 pesadas", "3 pesadas", "4 pesadas", "1 pesada"], correct: 0 },
+            97: { category: "SERIE SUPREMA", difficulty: "Leyenda", question: "<span class='text-mystic-gold font-mono'>2, 6, 12, 20, 30, 42, 56, ___</span> ¿Qué número ocupa la posición 8?", options: ["72", "70", "80", "68"], correct: 0 },
+            98: { category: "CÁLCULO INFINITO", difficulty: "Leyenda", question: "Calcula la suma infinita: <span class='text-mystic-gold font-mono'>1/2 + 1/4 + 1/8 + 1/16 + ...</span>", options: ["1", "2", "Infinito", "0.99"], correct: 0 },
+            99: { category: "PENÚLTIMA PRUEBA", difficulty: "Omnisciente", question: "Si el ayer de mañana fuera el mañana de ayer, ¿qué día sería con respecto a hoy?", options: ["El mismo día (Hoy)", "Ayer", "Mañana", "Hace dos días"], correct: 0 },
+
+            // ----- PISO 100: EL DESAFÍO DEFINITIVO -----
+            100: { 
+                category: "EL SELLO DE LA SABIDURÍA ABSOLUTA", 
+                difficulty: "Divino", 
+                question: "En la cúspide de los 100 pisos: Tienes 3 cajas. Una contiene solo oro, otra solo plata y la tercera mezcla de ambos. Las 3 están etiquetadas incorrectamente. Sacas 1 sola moneda de la caja etiquetada como 'Mezcla' y sale Oro. ¿Qué contiene realmente la caja etiquetada como 'Plata'?", 
+                options: ["Solo Oro", "Mezcla de Oro y Plata", "Solo Plata", "No se puede determinar"], 
+                correct: 0,
+                explanation: "Dado que todas las etiquetas están mal: La caja etiquetada como 'Mezcla' debe contener o solo oro o solo plata. Al sacar oro, esa caja es SOLO ORO. Por tanto, la caja etiquetada como 'Plata' no puede tener plata (etiqueta incorrecta) ni solo oro (ya encontrado), por lo que debe contener SOLO ORO o MEZCLA. Concretamente la caja etiquetada como 'Plata' debe contener solo ORO."
+            }
+        };
+
+        // ================= ESTADO DEL JUEGO =================
+        let currentFloor = 1;
+        let failuresCount = 0;
+        let timerSeconds = 0;
+        let timerInterval = null;
+        let isTransitioning = false;
+
+        // Web Audio API
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'door') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 1.2);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 1.2);
+                    osc.start(now);
+                    osc.stop(now + 1.2);
+                } else if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.5);
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                } else if (type === 'victory') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(554.37, now + 0.15);
+                    osc.frequency.setValueAtTime(659.25, now + 0.3);
+                    osc.frequency.setValueAtTime(880, now + 0.45);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.8);
+                    osc.start(now);
+                    osc.stop(now + 0.8);
+                }
+            } catch (e) {
+                console.log("Audio inactivo");
+            }
+        }
+
+        // ================= INICIALIZACIÓN =================
+        window.onload = function() {
+            startTimer();
+            updateHeaderUI();
+        };
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerSeconds = 0;
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+                const secs = String(timerSeconds % 60).padStart(2, '0');
+                document.getElementById('stat-time').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function updateHeaderUI() {
+            document.getElementById('current-floor-display').innerText = `${currentFloor} / 100`;
+            document.getElementById('stat-failures').innerText = failuresCount;
+
+            // Actualizar la barra de progreso proporcional al piso de 1 a 100
+            const fillPercentage = Math.max(1, Math.min(100, currentFloor));
+            document.getElementById('progress-bar-fill').style.width = `${fillPercentage}%`;
+        }
+
+        // ================= INTERACCIÓN PISO 1 (PUERTA) =================
+        function openFirstDoor() {
+            if (isTransitioning) return;
+            initAudio();
+            isTransitioning = true;
+
+            playSound('door');
+
+            const leftDoor = document.getElementById('door-left');
+            const rightDoor = document.getElementById('door-right');
+            const doorBtn = document.getElementById('door-btn');
+
+            leftDoor.classList.add('door-open-left');
+            rightDoor.classList.add('door-open-right');
+            doorBtn.style.opacity = '0';
+            doorBtn.style.transform = 'scale(0.5)';
+
+            setTimeout(() => {
+                currentFloor = 2;
+                updateHeaderUI();
+
+                document.getElementById('floor-1-view').classList.add('hidden');
+                document.getElementById('quiz-view').classList.remove('hidden');
+
+                loadPuzzle(currentFloor);
+                isTransitioning = false;
+                showToast("¡PUERTA SUPERADA!", "Comienzas tu largo ascenso al Piso 2", "fa-sharp fa-solid fa-door-open text-mystic-gold", "border-mystic-gold");
+            }, 1400);
+        }
+
+        // ================= CARGA Y GESTIÓN DE PUZLES (PISOS 2-100) =================
+        function loadPuzzle(floor) {
+            const puzzle = PUZZLES[floor];
+            if (!puzzle) return;
+
+            const quizCard = document.getElementById('quiz-card');
+            quizCard.classList.remove('anim-fall');
+            quizCard.classList.add('anim-rise');
+
+            document.getElementById('puzzle-category').innerText = puzzle.category;
+            document.getElementById('puzzle-difficulty').innerText = `Dificultad: ${puzzle.difficulty}`;
+            document.getElementById('puzzle-question').innerHTML = puzzle.question;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            puzzle.options.forEach((optText, index) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full p-4 rounded-xl bg-mystic-800/90 border border-mystic-gold/20 text-left hover:border-mystic-gold hover:bg-mystic-700/80 flex items-center justify-between text-sm sm:text-base text-gray-200 cursor-pointer shadow-md";
+                btn.onclick = () => checkAnswer(index);
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-lg bg-mystic-700 text-mystic-gold font-cinzel font-bold flex items-center justify-center border border-mystic-gold/30 text-xs">
+                            ${String.fromCharCode(65 + index)}
+                        </span>
+                        <span>${optText}</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            setTimeout(() => {
+                quizCard.classList.remove('anim-rise');
+            }, 600);
+        }
+
+        // ================= VERIFICACIÓN DE RESPUESTA Y PENALIZACIÓN =================
+        function checkAnswer(selectedIndex) {
+            if (isTransitioning) return;
+            initAudio();
+            isTransitioning = true;
+
+            const puzzle = PUZZLES[currentFloor];
+            const isCorrect = selectedIndex === puzzle.correct;
+
+            if (isCorrect) {
+                playSound('correct');
+                
+                if (currentFloor === 100) {
+                    // ¡VICTORIA TOTAL!
+                    finishGame();
+                } else {
+                    currentFloor++;
+                    updateHeaderUI();
+                    showToast("¡RESPUESTA CORRECTA!", `Asciendes al Piso ${currentFloor}`, "fa-solid fa-arrow-up text-emerald-400", "border-emerald-500");
+                    
+                    setTimeout(() => {
+                        loadPuzzle(currentFloor);
+                        isTransitioning = false;
+                    }, 1000);
+                }
+            } else {
+                // RESPUESTA INCORRECTA: PENALIZACIÓN DE -5 NIVELES
+                playSound('wrong');
+                failuresCount++;
+
+                if (currentFloor <= 5) {
+                    currentFloor = 1;
+                } else {
+                    currentFloor = currentFloor - 5;
+                }
+
+                updateHeaderUI();
+
+                const quizCard = document.getElementById('quiz-card');
+                quizCard.classList.add('anim-fall');
+
+                showToast("¡RESPUESTA INCORRECTA!", `Caes 5 niveles. Vuelves al Piso ${currentFloor}`, "fa-solid fa-arrow-down-long text-red-500", "border-red-500");
+
+                setTimeout(() => {
+                    quizCard.classList.remove('anim-fall');
+
+                    if (currentFloor === 1) {
+                        document.getElementById('quiz-view').classList.add('hidden');
+                        document.getElementById('floor-1-view').classList.remove('hidden');
+
+                        document.getElementById('door-left').classList.remove('door-open-left');
+                        document.getElementById('door-right').classList.remove('door-open-right');
+                        const doorBtn = document.getElementById('door-btn');
+                        doorBtn.style.opacity = '1';
+                        doorBtn.style.transform = 'scale(1)';
+                    } else {
+                        loadPuzzle(currentFloor);
+                    }
+                    isTransitioning = false;
+                }, 1200);
+            }
+        }
+
+        // ================= MOSTRAR MENSAJES FLOTANTES (TOAST) =================
+        function showToast(title, desc, iconClass, borderColor) {
+            const toast = document.getElementById('floor-toast');
+            const card = document.getElementById('toast-card');
+            const icon = document.getElementById('toast-icon');
+            const titleEl = document.getElementById('toast-title');
+            const descEl = document.getElementById('toast-desc');
+
+            card.className = `glass-panel px-8 py-6 rounded-2xl shadow-2xl text-center transform transition-all duration-300 scale-100 border-2 ${borderColor}`;
+            icon.className = `text-4xl mb-2 ${iconClass}`;
+            titleEl.innerText = title;
+            descEl.innerText = desc;
+
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 1400);
+        }
+
+        // ================= PANTALLA FINAL DE VICTORIA =================
+        function finishGame() {
+            clearInterval(timerInterval);
+            playSound('victory');
+
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('victory-view').classList.remove('hidden');
+
+            const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+            const secs = String(timerSeconds % 60).padStart(2, '0');
+
+            document.getElementById('final-time').innerText = `${mins}:${secs}`;
+            document.getElementById('final-failures').innerText = failuresCount;
+            isTransitioning = false;
+        }
+
+        // ================= REINICIAR EL JUEGO =================
+        function restartGame() {
+            currentFloor = 1;
+            failuresCount = 0;
+            isTransitioning = false;
+
+            updateHeaderUI();
+            startTimer();
+
+            document.getElementById('victory-view').classList.add('hidden');
+            document.getElementById('floor-1-view').classList.remove('hidden');
+
+            document.getElementById('door-left').classList.remove('door-open-left');
+            document.getElementById('door-right').classList.remove('door-open-right');
+            const doorBtn = document.getElementById('door-btn');
+            doorBtn.style.opacity = '1';
+            doorBtn.style.transform = 'scale(1)';
+        }
+    </script>
+</body>
+</html>
